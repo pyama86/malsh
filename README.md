@@ -1,5 +1,7 @@
 # Sac
 
+[![Code Climate](https://codeclimate.com/github/pyama86/sac/badges/gpa.svg)](https://codeclimate.com/github/pyama86/sac)
+
 ### mackerelの運用で便利な下記の機能を提供します。
 
 * 退役忘れホストの検知
