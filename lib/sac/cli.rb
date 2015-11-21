@@ -10,18 +10,14 @@ module Sac
 
     desc 'retire', 'check forget retire host'
     def retire
-      names = []
       Sac.init options
 
-      Sac.hosts.map.each_slice(200) do |hs|
-        lvgs = Mackerel.latest_tsdb({hostId: hs.map(&:id), name: 'loadavg5'})
+      names = Sac.metrics('loadavg5').map do|lvg|
+        host = Sac.host_by_id lvg.first
+        host.name if (!lvg.last.loadavg5.respond_to? :value || lvg.last.loadavg5.value == 0) && !invert?(host)
+      end.flatten.compact
 
-        names << hs.map do |host|
-          host.name if (!lvgs[host.id].loadavg5.respond_to? :value || lvgs[host.id].loadavg5.value == 0) && !invert?(host)
-        end
-      end
-
-      Sac.notify("退役未了ホスト一覧", names.flatten.compact)
+      Sac.notify("退役未了ホスト一覧", names)
     end
 
     desc 'find', 'find by hostname'

@@ -27,6 +27,18 @@ module Sac
   def self.hosts
     @_hosts ||= Mackerel.hosts
   end
+
+  def self.host_by_id(id)
+    hosts.find {|h| h.id == id}
+  end
+
+  def self.metrics(name)
+    hash = {}
+    self.hosts.map(&:id).each_slice(200) do |ids|
+      hash.merge!(Mackerel.latest_tsdb({hostId: ids, name: name}))
+    end
+    hash
+  end
 end
 
 
