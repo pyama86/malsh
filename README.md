@@ -1,5 +1,7 @@
 # Sac
 
+[![Build Status](https://travis-ci.org/pyama86/sac.svg)](https://travis-ci.org/pyama86/sac)
+
 [![Code Climate](https://codeclimate.com/github/pyama86/sac/badges/gpa.svg)](https://codeclimate.com/github/pyama86/sac)
 
 ### mackerelの運用で便利な下記の機能を提供します。
