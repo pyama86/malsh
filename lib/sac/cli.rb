@@ -4,6 +4,7 @@ module Sac
   class CLI < Thor
     class_option :slack_webhook, :type => :string, :aliases => :sw
     class_option :slack_channel, :type => :string, :aliases => :sc
+    class_option :slack_user, :type => :string, :aliases => :su
     class_option :api_key, :type => :string, :aliases => :k
     class_option :subject, :type => :string, :aliases => :s
     class_option :invert_match, :type => :array, :aliases => :v

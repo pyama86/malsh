@@ -33,13 +33,14 @@ $ sac maverick --subject 無所属ホスト
 ```
 
 ## options
-* --slack-webhook
+* --slack-webhook or ENV["SLACK_WEBHOOK"]
 slackのwebhookurlを指定するとslackに通知することができます。
-* --slack-channel
+* --slack-channel or ENV["SLACK_WEBCHANNEL"]
 slackの通知先チャネルを指定します。
-* --api-key
+* --slack-user or ENV["SLACK_USER"]
+slackの通知ユーザーを指定します。
+* --api-key or ENV["MACKEREL_APIKEY"]
 mackerelのAPIキーを指定します。
-環境変数`MACKEREL_APIKEY`に設定することでも同等の挙動をします。
 * --subject
 通知のタイトルを指定します
 * --invert-match
