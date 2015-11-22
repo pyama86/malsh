@@ -14,7 +14,7 @@ module Sac
 
       names = Sac.metrics('loadavg5').map do|lvg|
         host = Sac.host_by_id lvg.first
-        host.name if (!lvg.last.loadavg5.respond_to? :value || lvg.last.loadavg5.value == 0) && !invert?(host)
+        host.name if (!lvg.last.loadavg5.respond_to? :value || lvg.last.loadavg5.value == 0)
       end.flatten.compact
 
       Sac.notify("退役未了ホスト一覧", names)
@@ -26,7 +26,7 @@ module Sac
       Sac.init options
 
       names = Sac.hosts.map do |h|
-        h.name if options[:regexp].find{|r| h.name.match(/#{r}/)} && !invert?(h)
+        h.name if options[:regexp].find{|r| h.name.match(/#{r}/)}
       end.flatten.compact
 
       Sac.notify("不要ホスト候補一覧", names.flatten.compact)
@@ -37,7 +37,7 @@ module Sac
       Sac.init options
 
       names = Sac.hosts.map do |h|
-        h.name if h.roles.keys.size < 1 && !invert?(h)
+        h.name if h.roles.keys.size < 1
       end.flatten.compact
 
       Sac.notify("ロール無所属ホスト一覧", names.flatten.compact)
@@ -51,9 +51,6 @@ module Sac
     end
 
     no_commands do
-      def invert?(host)
-        Sac.options[:invert_match] && Sac.options[:invert_match].find {|v| host.name.match(/#{v}/)}
-      end
     end
   end
 end

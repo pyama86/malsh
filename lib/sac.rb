@@ -25,7 +25,7 @@ module Sac
   end
 
   def self.hosts
-    @_hosts ||= Mackerel.hosts
+    @_hosts ||= Mackerel.hosts.reject {|h| Sac.options[:invert_match] && Sac.options[:invert_match].find {|v| h.name.match(/#{v}/)}}
   end
 
   def self.host_by_id(id)
