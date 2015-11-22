@@ -15,9 +15,8 @@ module Sac
 
       names = Sac.metrics('loadavg5').map do|lvg|
         host = Sac.host_by_id lvg.first
-        host.name if (!lvg.last.loadavg5.respond_to? :value || lvg.last.loadavg5.value == 0)
+        host.name if (!lvg.last.loadavg5.respond_to?(:value) || lvg.last.loadavg5.value == 0)
       end.flatten.compact
-
       Sac.notify("退役未了ホスト一覧", names)
     end
 
