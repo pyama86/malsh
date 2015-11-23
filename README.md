@@ -1,7 +1,7 @@
 # Malsh
 *Mackerel Sheperd = malsh*
 
-[![Build Status](https://travis-ci.org/pyama86/sac.svg)](https://travis-ci.org/pyama86/sac)
+[![Build Status](https://travis-ci.org/pyama86/malsh.svg)](https://travis-ci.org/pyama86/malsh)
 
 [![Code Climate](https://codeclimate.com/github/pyama86/sac/badges/gpa.svg)](https://codeclimate.com/github/pyama86/sac)
 
