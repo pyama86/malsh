@@ -46,8 +46,7 @@ module Malsh
     map %w[--version -v] => :__print_version
     desc "--version, -v", "print the version"
     def __print_version
-      Malsh.options = options
-      puts Pec::VERSION
+      puts Malsh::VERSION
     end
 
     no_commands do
