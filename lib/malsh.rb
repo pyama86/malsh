@@ -1,14 +1,14 @@
-require "sac/version"
+require "malsh/version"
 require 'thor'
 require 'mackerel-rb'
-require "sac/cli"
-require "sac/notification"
+require "malsh/cli"
+require "malsh/notification"
 
-module Sac
+module Malsh
 
   def self.notify(subject, host)
-    Sac::Notification.constants.each do |c|
-      Object.const_get("Sac::Notification::#{c}").notify(self.options[:subject] || subject, host)
+    Malsh::Notification.constants.each do |c|
+      Object.const_get("Malsh::Notification::#{c}").notify(self.options[:subject] || subject, host)
     end
   end
 
@@ -25,7 +25,7 @@ module Sac
   end
 
   def self.hosts
-    @_hosts ||= Mackerel.hosts.reject {|h| Sac.options[:invert_match] && Sac.options[:invert_match].find {|v| h.name.match(/#{v}/)}}
+    @_hosts ||= Mackerel.hosts.reject {|h| Malsh.options[:invert_match] && Malsh.options[:invert_match].find {|v| h.name.match(/#{v}/)}}
   end
 
   def self.host_by_id(id)

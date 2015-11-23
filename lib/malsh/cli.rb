@@ -1,6 +1,6 @@
-require 'sac'
+require 'malsh'
 require 'pp'
-module Sac
+module Malsh
   class CLI < Thor
     class_option :slack_webhook, :type => :string, :aliases => :sw
     class_option :slack_channel, :type => :string, :aliases => :sc
@@ -11,42 +11,42 @@ module Sac
 
     desc 'retire', 'check forget retire host'
     def retire
-      Sac.init options
+      Malsh.init options
 
-      names = Sac.metrics('loadavg5').map do|lvg|
-        host = Sac.host_by_id lvg.first
-        host.name if (!lvg.last.loadavg5.respond_to?(:value) || lvg.last.loadavg5.value == 0)
+      names = Malsh.metrics('loadavg5').map do|lvg|
+        host = Malsh.host_by_id lvg.first
+        host.name if (!lvg.last.loadavg5.respond_to?(:value) || !lvg.last.loadavg5.value)
       end.flatten.compact
-      Sac.notify("退役未了ホスト一覧", names)
+      Malsh.notify("退役未了ホスト一覧", names)
     end
 
     desc 'find', 'find by hostname'
     option :regexp, :require => true, :type => :array, :aliases => :e
     def find
-      Sac.init options
+      Malsh.init options
 
-      names = Sac.hosts.map do |h|
+      names = Malsh.hosts.map do |h|
         h.name if options[:regexp].find{|r| h.name.match(/#{r}/)}
       end.flatten.compact
 
-      Sac.notify("不要ホスト候補一覧", names.flatten.compact)
+      Malsh.notify("不要ホスト候補一覧", names.flatten.compact)
     end
 
     desc 'maverick', 'check no role'
     def maverick
-      Sac.init options
+      Malsh.init options
 
-      names = Sac.hosts.map do |h|
+      names = Malsh.hosts.map do |h|
         h.name if h.roles.keys.size < 1
       end.flatten.compact
 
-      Sac.notify("ロール無所属ホスト一覧", names.flatten.compact)
+      Malsh.notify("ロール無所属ホスト一覧", names.flatten.compact)
     end
 
     map %w[--version -v] => :__print_version
     desc "--version, -v", "print the version"
     def __print_version
-      Sac.options = options
+      Malsh.options = options
       puts Pec::VERSION
     end
 

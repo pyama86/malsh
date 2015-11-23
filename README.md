@@ -1,8 +1,10 @@
-# Sac
+# Malsh
+*Mackerel Sheperd = malsh*
 
-[![Build Status](https://travis-ci.org/pyama86/sac.svg)](https://travis-ci.org/pyama86/sac)
+[![Build Status](https://travis-ci.org/pyama86/malsh.svg)](https://travis-ci.org/pyama86/malsh)
 
-[![Code Climate](https://codeclimate.com/github/pyama86/sac/badges/gpa.svg)](https://codeclimate.com/github/pyama86/sac)
+[![Code Climate](https://codeclimate.com/github/pyama86/malsh/badges/gpa.svg)](https://codeclimate.com/github/pyama86/malsh)
+
 
 ### mackerelの運用で便利な下記の機能を提供します。
 
@@ -16,7 +18,7 @@
 ## Installation
 
 ```ruby
-gem install sac
+gem install malsh
 ```
 
 ## Usage
@@ -25,13 +27,13 @@ gem install sac
 $ export MACKEREL_APIKEY=xxxxxxxxxxxxxxxxxxxxxxxxxx
 
 # 過去5分間メトリックの投稿がないホストを検知
-$ sac retire --subject 退役忘れホスト
+$ malsh retire --subject 退役忘れホスト
 
 # 指定された単語がホスト名に含まれるホストを検知
-$ sac find --regex dev local$ --subject developmentホスト
+$ malsh find --regex dev local$ --subject developmentホスト
 
 # ロールに所属していないホストを検知
-$ sac maverick --subject 無所属ホスト
+$ malsh maverick --subject 無所属ホスト
 ```
 
 ## options
