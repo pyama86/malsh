@@ -21,7 +21,7 @@ module Malsh
     end
 
     desc 'find', 'find by hostname'
-    option :regexp, :require => true, :type => :array, :aliases => :e
+    option :regexp, :required => true, :type => :array, :aliases => :e
     def find
       Malsh.init options
 
