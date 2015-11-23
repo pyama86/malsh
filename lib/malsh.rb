@@ -18,6 +18,11 @@ module Malsh
   end
 
   def self.init(options)
+    unless ENV['MACKEREL_APIKEY'] && options[:api_key]
+      puts "must set be mackerel api key <--api-key> or ENV['MACKEREL_APIKEY']"
+      exit
+    end
+
     self.options options
     Mackerel.configure do |config|
       config.api_key = ENV['MACKEREL_APIKEY'] || options[:api_key]
