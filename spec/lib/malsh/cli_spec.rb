@@ -17,6 +17,12 @@ describe Malsh::CLI do
           double(id: 1, name: "retire_host"),
           double(id: 2, name: "enable_host"),
         ])
+        allow(Mackerel).to receive(:host).with(1).and_return(
+          double(id: 1, name: "retire_host"),
+        )
+        allow(Mackerel).to receive(:host).with(2).and_return(
+          double(id: 1, name: "retire_host"),
+        )
       end
       subject { Malsh::CLI.new.invoke(:retire, [], {}) }
 
