@@ -34,7 +34,7 @@ module Malsh
   end
 
   def self.host_by_id(id)
-    hosts.find {|h| h.id == id}
+    Mackerel.host(id)
   end
 
   def self.metrics(name)
