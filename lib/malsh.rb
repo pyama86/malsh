@@ -44,6 +44,14 @@ module Malsh
       end
       hash
     end
+
+    def host_metrics(id, name, from, to)
+      begin
+        Mackerel.host_metrics(id, name: name, from: from, to: to)
+      rescue => e
+        puts e
+      end
+    end
   end
 end
 
