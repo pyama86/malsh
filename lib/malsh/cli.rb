@@ -52,12 +52,10 @@ module Malsh
     def obese
       resources = %w(cpu memory)
       _host_names = {}
-
       Malsh.init options
       now = Time.now.to_i
       # 7 = 1week
       from = now - (options[:past_date] || 7) * 86400
-
       resources.each do |resource|
         _host_names[resource] = Parallel.map(Malsh.hosts) do |h|
           value = self.send("max_#{resource}_usage", h, from, now)
@@ -92,24 +90,21 @@ module Malsh
       end
 
       def max_cpu_usage(host, from, to)
-        cpu_use_resource = %w(cpu.user.percentage cpu.iowait.percentage cpu.system.percentage cpu.iowait.percentage)
+        cpu_use_resource = %w(cpu.user.percentage cpu.iowait.percentage cpu.system.percentage)
         hash = get_host_metrics(cpu_use_resource, host, from, to)
-
         max = hash.max_by do |time,cpu|
           cpu_use_resource.map { |name| cpu[name] }.inject(:+)
         end
-
         cpu_use_resource.map { |name| max.last[name] }.inject(:+) / host["meta"]["cpu"].size
       end
 
       def max_memory_usage(host, from, to)
         memory_use_resource =  %w(memory.total memory.used memory.cached)
         hash = get_host_metrics(memory_use_resource, host, from, to)
-
         max = hash.max_by do |time,memory|
           (memory["memory.used"] + memory["memory.cached"]) / memory["memory.total"] * 100 if memory["memory.total"]
         end
-          (max.last["memory.used"] + max.last["memory.cached"]) / max.last["memory.total"] * 100
+        (max.last["memory.used"] + max.last["memory.cached"]) / max.last["memory.total"] * 100
       end
     end
   end
