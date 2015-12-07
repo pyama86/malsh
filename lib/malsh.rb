@@ -3,6 +3,7 @@ require 'thor'
 require 'mackerel-rb'
 require "malsh/cli"
 require "malsh/notification"
+require "malsh/host_metrics"
 
 module Malsh
   class << self
