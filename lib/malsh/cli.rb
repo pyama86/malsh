@@ -1,4 +1,5 @@
 require 'malsh'
+require 'parallel'
 require 'pp'
 module Malsh
   class CLI < Thor
@@ -13,11 +14,12 @@ module Malsh
     def retire
       Malsh.init options
 
-      names = Malsh.metrics('loadavg5').map do|lvg|
+      host_names = Parallel.map(Malsh.metrics('loadavg5')) do|lvg|
         host = Malsh.host_by_id lvg.first
         host.name if (!lvg.last.loadavg5.respond_to?(:value) || !lvg.last.loadavg5.value)
       end.flatten.compact
-      Malsh.notify("退役未了ホスト一覧", names)
+
+      Malsh.notify("退役未了ホスト一覧", host_names)
     end
 
     desc 'find', 'find by hostname'
@@ -25,22 +27,40 @@ module Malsh
     def find
       Malsh.init options
 
-      names = Malsh.hosts.map do |h|
+      host_names = Parallel.map(Malsh.hosts) do |h|
         h.name if options[:regexp].find{|r| h.name.match(/#{r}/)}
       end.flatten.compact
 
-      Malsh.notify("不要ホスト候補一覧", names.flatten.compact)
+      Malsh.notify("不要ホスト候補一覧", host_names)
     end
 
     desc 'maverick', 'check no role'
     def maverick
       Malsh.init options
 
-      names = Malsh.hosts.map do |h|
+      host_names = Parallel.map(Malsh.hosts) do |h|
         h.name if h.roles.keys.size < 1
       end.flatten.compact
 
-      Malsh.notify("ロール無所属ホスト一覧", names.flatten.compact)
+      Malsh.notify("ロール無所属ホスト一覧", host_names)
+    end
+
+    desc 'obese', 'check obese hosts'
+    option :past_date , :type => :numeric, :aliases => :p
+    option :cpu_threshold, :type => :numeric, :aliases => :c
+    option :memory_threshold, :type => :numeric, :aliases => :m
+    def obese
+      _host_names = {}
+      Malsh.init options
+      now = Time.now.to_i
+      # 7 = 1week
+      from = now - (options[:past_date] || 7) * 86400
+
+      hosts = Malsh.hosts
+      Object.const_get("Malsh::HostMetrics").constants.each do |c|
+        hosts = Object.const_get("Malsh::HostMetrics::#{c}").check(hosts, from, now)
+      end
+      Malsh.notify("余剰リソースホスト一覧", hosts.compact.map {|h| h["name"]})
     end
 
     map %w[--version -v] => :__print_version

@@ -17,6 +17,12 @@ describe Malsh::CLI do
           double(id: 1, name: "retire_host"),
           double(id: 2, name: "enable_host"),
         ])
+        allow(Mackerel).to receive(:host).with(1).and_return(
+          double(id: 1, name: "retire_host"),
+        )
+        allow(Mackerel).to receive(:host).with(2).and_return(
+          double(id: 1, name: "retire_host"),
+        )
       end
       subject { Malsh::CLI.new.invoke(:retire, [], {}) }
 
@@ -56,6 +62,80 @@ describe Malsh::CLI do
         is_expected.to be_truthy
         expect(Malsh::Notification::Base).to have_received(:notify).with("ロール無所属ホスト一覧", ["maverick_host"])
       }
+    end
+
+    describe '.#obese' do
+      before do
+        allow(Mackerel).to receive(:hosts).and_return([
+          {
+            "id" => 1,
+            "name" => "example_host",
+            "meta" => {
+              "cpu" => [0, 1]
+            }
+          }
+        ])
+      end
+
+      shared_examples_for 'resource_check' do
+        subject { Malsh::CLI.new.invoke(:obese, [], options) }
+        context 'unmatch' do
+          before do
+            resources.each_with_index do |resource,index|
+              allow(Malsh).to receive(:host_metrics).with(1,resource,any_args).and_return(
+                double(
+                  metrics: [
+                    double(time: 1, value: index.to_f),
+                    double(time: 2, value: (index+1).to_f)
+                  ]
+                )
+              )
+            end
+          end
+
+          it 'upper threshould' do
+            is_expected.to be_truthy
+            expect(Malsh::Notification::Base).to have_received(:notify).with("余剰リソースホスト一覧", [])
+          end
+        end
+
+        context 'match' do
+          before do
+            resources.each_with_index do |resource,index|
+              allow(Malsh).to receive(:host_metrics).with(1,resource,any_args).and_return(
+                double(
+                  metrics: [
+                    double(time: 1, value: index.to_f)
+                  ]
+                )
+              )
+            end
+          end
+
+          it 'lower threshold' do
+            is_expected.to be_truthy
+            expect(Malsh::Notification::Base).to have_received(:notify).with("余剰リソースホスト一覧", ["example_host"])
+          end
+        end
+      end
+
+      context 'cpu' do
+        let(:options) { { cpu_threshold: 3 } }
+        let(:resources) { %w(cpu.user.percentage cpu.iowait.percentage cpu.system.percentage) }
+        it_behaves_like 'resource_check'
+      end
+
+      context 'memory' do
+        let(:options) { { memory_threshold: 51 } }
+        let(:resources) { %w(memory.used memory.cached memory.total) }
+        it_behaves_like 'resource_check'
+      end
+
+      context 'cpu and memory' do
+        let(:options) { { cpu_threshold: 3, memory_threshold: 141 } }
+        let(:resources) { %w(cpu.user.percentage cpu.iowait.percentage cpu.system.percentage memory.used memory.cached memory.total) }
+        it_behaves_like 'resource_check'
+      end
     end
   end
   context 'options' do
