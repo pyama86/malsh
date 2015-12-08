@@ -14,7 +14,7 @@ module Malsh
     def retire
       Malsh.init options
 
-      host_names = Malsh.metrics('loadavg5').map do|lvg|
+      host_names = Parallel.map(Malsh.metrics('loadavg5')) do|lvg|
         host = Malsh.host_by_id lvg.first
         host.name if (!lvg.last.loadavg5.respond_to?(:value) || !lvg.last.loadavg5.value)
       end.flatten.compact
@@ -27,7 +27,7 @@ module Malsh
     def find
       Malsh.init options
 
-      host_names = Malsh.hosts.map do |h|
+      host_names = Parallel.map(Malsh.hosts) do |h|
         h.name if options[:regexp].find{|r| h.name.match(/#{r}/)}
       end.flatten.compact
 
@@ -38,7 +38,7 @@ module Malsh
     def maverick
       Malsh.init options
 
-      host_names = Malsh.hosts.map do |h|
+      host_names = Parallel.map(Malsh.hosts) do |h|
         h.name if h.roles.keys.size < 1
       end.flatten.compact
 
