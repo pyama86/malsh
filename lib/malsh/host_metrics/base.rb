@@ -1,7 +1,11 @@
 module Malsh::HostMetrics
   class Base
     class << self
-      def check(hosts, from, to)
+      def check(hosts)
+        to  = Time.now.to_i
+        # 7 = 1week
+        from = to - (Malsh.options[:past_date] || 7) * 86400
+
         if Malsh.options[option_name]
           Parallel.map(hosts) do |h|
             value = get_max_usage(h, from, to) if h

@@ -32,22 +32,6 @@ describe Malsh::CLI do
       }
     end
 
-    describe '.#find' do
-      before do
-        allow(Mackerel).to receive(:hosts).and_return([
-          double(id: 1, name: "develop_host"),
-          double(id: 2, name: "host_local"),
-          double(id: 3, name: "local_host"),
-          double(id: 4, name: "production_host"),
-        ])
-      end
-      subject { Malsh::CLI.new.invoke(:find, [], {regexp: ["dev", "local$"]}) }
-
-      it {
-        is_expected.to be_truthy
-        expect(Malsh::Notification::Base).to have_received(:notify).with("不要ホスト候補一覧", ["develop_host", "host_local"])
-      }
-    end
 
     describe '.#maverick' do
       before do
@@ -64,7 +48,7 @@ describe Malsh::CLI do
       }
     end
 
-    describe '.#obese' do
+    describe '.#search' do
       before do
         allow(Mackerel).to receive(:hosts).and_return([
           {
@@ -78,7 +62,8 @@ describe Malsh::CLI do
       end
 
       shared_examples_for 'resource_check' do
-        subject { Malsh::CLI.new.invoke(:obese, [], options) }
+        subject { Malsh::CLI.new.invoke(:search, [], options) }
+
         context 'unmatch' do
           before do
             resources.each_with_index do |resource,index|
@@ -95,7 +80,7 @@ describe Malsh::CLI do
 
           it 'upper threshould' do
             is_expected.to be_truthy
-            expect(Malsh::Notification::Base).to have_received(:notify).with("余剰リソースホスト一覧", [])
+            expect(Malsh::Notification::Base).to have_received(:notify).with("ホスト一覧", [])
           end
         end
 
@@ -114,7 +99,7 @@ describe Malsh::CLI do
 
           it 'lower threshold' do
             is_expected.to be_truthy
-            expect(Malsh::Notification::Base).to have_received(:notify).with("余剰リソースホスト一覧", ["example_host"])
+            expect(Malsh::Notification::Base).to have_received(:notify).with("ホスト一覧", ["example_host"])
           end
         end
       end
@@ -138,14 +123,19 @@ describe Malsh::CLI do
       end
     end
   end
+
   context 'options' do
+    before do
+      allow(Mackerel).to receive(:hosts).and_return([
+        double(id: 1, name: "develop_host", :[] => "develop_host"),
+        double(id: 2, name: "host_local", :[] => "host_local"),
+        double(id: 3, name: "local_host", :[] => "loal_host"),
+        double(id: 4, name: "production_host", :[] => "production_host")
+      ])
+    end
+
     describe 'subject' do
-      before do
-        allow(Mackerel).to receive(:hosts).and_return([
-          double(id: 1, name: "develop_host")
-        ])
-      end
-      subject { Malsh::CLI.new.invoke(:find, [], {regexp: ["dev"], subject: "subject"}) }
+      subject { Malsh::CLI.new.invoke(:search, [], {regexp: ["dev"], subject: "subject"}) }
 
       it {
         is_expected.to be_truthy
@@ -153,20 +143,21 @@ describe Malsh::CLI do
       }
     end
 
-    describe 'invert_match' do
-      before do
-        allow(Mackerel).to receive(:hosts).and_return([
-          double(id: 1, name: "develop_host"),
-          double(id: 2, name: "host_local"),
-          double(id: 3, name: "local_host"),
-          double(id: 4, name: "production_host"),
-        ])
-      end
-      subject { Malsh::CLI.new.invoke(:find, [], {regexp: ["dev", "local$"], invert_match: ["host_local"]}) }
+    describe 'regexp' do
+      subject { Malsh::CLI.new.invoke(:search, [], {regexp: ["dev", "local$"]}) }
 
       it {
         is_expected.to be_truthy
-        expect(Malsh::Notification::Base).to have_received(:notify).with("不要ホスト候補一覧", ["develop_host"])
+        expect(Malsh::Notification::Base).to have_received(:notify).with("ホスト一覧", ["develop_host", "host_local"])
+      }
+    end
+
+    describe 'invert_match' do
+      subject { Malsh::CLI.new.invoke(:search, [], {regexp: ["dev", "local$"], invert_match: ["host_local"]}) }
+
+      it {
+        is_expected.to be_truthy
+        expect(Malsh::Notification::Base).to have_received(:notify).with("ホスト一覧", ["develop_host"])
       }
     end
   end
