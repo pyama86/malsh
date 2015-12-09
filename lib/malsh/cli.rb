@@ -9,6 +9,7 @@ module Malsh
     class_option :api_key, :type => :string, :aliases => :k
     class_option :subject, :type => :string, :aliases => :s
     class_option :invert_match, :type => :array, :aliases => :v
+    class_option :regexp,:type => :array, :aliases => :e
 
     desc 'retire', 'check forget retire host'
     def retire
@@ -22,18 +23,6 @@ module Malsh
       Malsh.notify("退役未了ホスト一覧", host_names)
     end
 
-    desc 'find', 'find by hostname'
-    option :regexp, :required => true, :type => :array, :aliases => :e
-    def find
-      Malsh.init options
-
-      host_names = Parallel.map(Malsh.hosts) do |h|
-        h.name if options[:regexp].find{|r| h.name.match(/#{r}/)}
-      end.flatten.compact
-
-      Malsh.notify("不要ホスト候補一覧", host_names)
-    end
-
     desc 'maverick', 'check no role'
     def maverick
       Malsh.init options
@@ -45,22 +34,19 @@ module Malsh
       Malsh.notify("ロール無所属ホスト一覧", host_names)
     end
 
-    desc 'obese', 'check obese hosts'
+    desc 'search', 'search hosts'
     option :past_date , :type => :numeric, :aliases => :p
     option :cpu_threshold, :type => :numeric, :aliases => :c
     option :memory_threshold, :type => :numeric, :aliases => :m
-    def obese
+    def search
       _host_names = {}
       Malsh.init options
-      now = Time.now.to_i
-      # 7 = 1week
-      from = now - (options[:past_date] || 7) * 86400
 
       hosts = Malsh.hosts
       Object.const_get("Malsh::HostMetrics").constants.each do |c|
-        hosts = Object.const_get("Malsh::HostMetrics::#{c}").check(hosts, from, now)
+        hosts = Object.const_get("Malsh::HostMetrics::#{c}").check(hosts)
       end
-      Malsh.notify("余剰リソースホスト一覧", hosts.compact.map {|h| h["name"]})
+      Malsh.notify("ホスト一覧", hosts.compact.map {|h| h["name"]})
     end
 
     map %w[--version -v] => :__print_version
