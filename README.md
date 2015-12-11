@@ -1,19 +1,19 @@
 # Malsh
-*Mackerel Sheperd = malsh*
+*Mackerel Shepherd = malsh(マルシェ)*
 
 [![Build Status](https://travis-ci.org/pyama86/malsh.svg)](https://travis-ci.org/pyama86/malsh)
 
 [![Code Climate](https://codeclimate.com/github/pyama86/sac/badges/gpa.svg)](https://codeclimate.com/github/pyama86/sac)
 
 
-### mackerelの運用で便利な下記の機能を提供します。
+### Mackerelの運用で便利な機能を提供します。
 
-* 退役忘れホストの検知
-* ロールに紐付いてないホストの検知
-* 特定のホスト名やCPU、メモリ利用率での検索
+* 退役忘れホストの通知
+* ロールに紐付いてないホストの通知
+* 特定のホスト名やCPU、メモリ利用率での検索結果の通知
 
-### 通知機能
-* Slackへの通知
+### 通知先
+* Slack
 
 ## Installation
 
@@ -41,27 +41,19 @@ $ malsh search --cpu 40 --memory 40 --subject 過去7日間のCPU、メモリが
 
 ## options
 * --slack-webhook or ENV["SLACK_WEBHOOK"]
-
-slackのwebhookurlを指定するとslackに通知することができます。
+ * slackのwebhookurlを指定するとslackに通知することができます。
 * --slack-channel or ENV["SLACK_CHANNEL"]
-
-slackの通知先チャネルを指定します。
+ * slackの通知先チャネルを指定します。
 * --slack-user or ENV["SLACK_USER"]
-
-slackの通知ユーザーを指定します。
+ * slackの通知ユーザーを指定します。
 * --api-key or ENV["MACKEREL_APIKEY"]
-
-mackerelのAPIキーを指定します。
+ * mackerelのAPIキーを指定します。
 * --subject
-
-通知のタイトルを指定します
+ * 通知のタイトルを指定します
 * --invert-match
-
-除外したいホスト名を正規表現で指定します。
-
+ * 除外したいホスト名を正規表現で指定します。
 * --regex
-
-特定したいホスト名を正規表現で指定します。
+ * 特定したいホスト名を正規表現で指定します。
 
 ## Author
 pyama86
