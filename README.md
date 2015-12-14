@@ -36,7 +36,7 @@ $ malsh maverick --subject 無所属ホスト
 $ malsh search --regex dev local$ --subject developmentホスト
 
 # CPUとメモリの過去7日間の最高使用率が40%以下のホストをを検知
-$ malsh search --cpu 40 --memory 40 --subject 過去7日間のCPU、メモリがの最高使用率が40%以下
+$ malsh search --past_date 7 --cpu 40 --memory 40 --subject 過去7日間のCPU、メモリがの最高使用率が40%以下
 ```
 
 ## options
