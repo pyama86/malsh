@@ -38,11 +38,12 @@ module Malsh
     option :past_date , :type => :numeric, :aliases => :p
     option :cpu_threshold, :type => :numeric, :aliases => :c
     option :memory_threshold, :type => :numeric, :aliases => :m
+    option :status, :type => :string, :aliases => :st
     def search
       _host_names = {}
       Malsh.init options
-
-      hosts = Malsh.hosts
+      o = options[:status] ? { status: options[:status] } : {}
+      hosts = Malsh.hosts(o)
       Object.const_get("Malsh::HostMetrics").constants.each do |c|
         hosts = Object.const_get("Malsh::HostMetrics::#{c}").check(hosts)
       end

@@ -30,8 +30,8 @@ module Malsh
       end
     end
 
-    def hosts
-      @_hosts ||= Mackerel.hosts.reject do |h|
+    def hosts(options = {})
+      @_hosts ||= Mackerel.hosts(options).reject do |h|
         Malsh.options[:invert_match] && Malsh.options[:invert_match].find {|v| h.name.match(/#{v}/) }
       end.reject do |h|
         Malsh.options[:regexp] && Malsh.options[:regexp].all? {|r| !h.name.match(/#{r}/)}
