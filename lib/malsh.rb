@@ -32,10 +32,14 @@ module Malsh
 
     def hosts(options = {})
       @_hosts ||= Mackerel.hosts(options).reject do |h|
-        Malsh.options[:invert_match] && Malsh.options[:invert_match].find {|v| h.name.match(/#{v}/) }
+        Malsh.options[:invert_match] && Malsh.options[:invert_match].find {|v| host_name(h).match(/#{v}/) }
       end.reject do |h|
-        Malsh.options[:regexp] && Malsh.options[:regexp].all? {|r| !h.name.match(/#{r}/)}
+        Malsh.options[:regexp] && Malsh.options[:regexp].all? {|r| !host_name(h).match(/#{r}/)}
       end
+    end
+
+    def host_name(host)
+      host.displayName || host.name
     end
 
     def host_by_id(id)
@@ -59,5 +63,3 @@ module Malsh
     end
   end
 end
-
-
