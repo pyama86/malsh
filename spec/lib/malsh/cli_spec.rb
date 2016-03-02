@@ -14,14 +14,14 @@ describe Malsh::CLI do
             [2, double(loadavg5: double(value: 1))],
         ])
         allow(Mackerel).to receive(:hosts).and_return([
-          double(id: 1, name: "retire_host"),
-          double(id: 2, name: "enable_host"),
+          double(id: 1, name: "retire_host", displayName: nil),
+          double(id: 2, name: "enable_host", displayName: nil),
         ])
         allow(Mackerel).to receive(:host).with(1).and_return(
-          double(id: 1, name: "retire_host"),
+          double(id: 1, name: "retire_host", displayName: nil),
         )
         allow(Mackerel).to receive(:host).with(2).and_return(
-          double(id: 1, name: "retire_host"),
+          double(id: 1, name: "retire_host", displayName: nil),
         )
       end
       subject { Malsh::CLI.new.invoke(:retire, [], {}) }
@@ -36,8 +36,8 @@ describe Malsh::CLI do
     describe '.#maverick' do
       before do
         allow(Mackerel).to receive(:hosts).and_return([
-          double(id: 1, name: "have_role_host", roles: {test: 1}),
-          double(id: 2, name: "maverick_host", roles: {})
+          double(id: 1, name: "have_role_host", displayName: nil, roles: {test: 1}),
+          double(id: 2, name: "maverick_host", displayName: nil, roles: {})
         ])
       end
       subject { Malsh::CLI.new.invoke(:maverick, [], {}) }
@@ -127,10 +127,10 @@ describe Malsh::CLI do
   context 'options' do
     before do
       allow(Mackerel).to receive(:hosts).and_return([
-        double(id: 1, name: "develop_host", :[] => "develop_host"),
-        double(id: 2, name: "host_local", :[] => "host_local"),
-        double(id: 3, name: "local_host", :[] => "loal_host"),
-        double(id: 4, name: "production_host", :[] => "production_host")
+        double(id: 1, name: "develop_host", displayName: nil, :[] => "develop_host"),
+        double(id: 2, name: "host_local", displayName: nil, :[] => "host_local"),
+        double(id: 3, name: "local_host", displayName: nil, :[] => "loal_host"),
+        double(id: 4, name: "production_host", displayName: nil, :[] => "production_host")
       ])
     end
 
