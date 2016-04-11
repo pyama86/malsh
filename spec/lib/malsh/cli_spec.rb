@@ -10,8 +10,8 @@ describe Malsh::CLI do
     describe '.#retire' do
       before do
         allow(Malsh).to receive(:metrics).and_return([
-            [1, double(loadavg5: nil)],
-            [2, double(loadavg5: double(value: 1))],
+          [1, "memory.used" => nil],
+          [2, "memory.used" => double(value: 1)],
         ])
         allow(Mackerel).to receive(:hosts).and_return([
           double(id: 1, name: "retire_host", displayName: nil),
