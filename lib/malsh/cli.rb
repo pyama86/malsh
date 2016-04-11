@@ -15,9 +15,9 @@ module Malsh
     def retire
       Malsh.init options
 
-      host_names = Parallel.map(Malsh.metrics('loadavg5')) do|lvg|
-        host = Malsh.host_by_id lvg.first
-        host.name if (!lvg.last.loadavg5.respond_to?(:value) || !lvg.last.loadavg5.value)
+      host_names = Parallel.map(Malsh.metrics('memory.used')) do|memory|
+        host = Malsh.host_by_id memory.first
+        host.name if (!memory.last["memory.used"].respond_to?(:value) || !memory.last["memory.used"].value)
       end.flatten.compact
 
       Malsh.notify("退役未了ホスト一覧", host_names)
