@@ -35,6 +35,11 @@ module Malsh
         Malsh.options[:invert_match] && Malsh.options[:invert_match].find {|v| host_name(h).match(/#{v}/) }
       end.reject do |h|
         Malsh.options[:regexp] && Malsh.options[:regexp].all? {|r| !host_name(h).match(/#{r}/)}
+      end.reject do |h|
+        Malsh.options[:invert_role] && Malsh.options[:invert_role].find do |r|
+          service, role = r.split(/:/)
+          h.roles[service] && h.roles[service].include?(role)
+        end
       end
     end
 

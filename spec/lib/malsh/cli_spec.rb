@@ -127,10 +127,10 @@ describe Malsh::CLI do
   context 'options' do
     before do
       allow(Mackerel).to receive(:hosts).and_return([
-        double(id: 1, name: "develop_host", displayName: nil, :[] => "develop_host"),
-        double(id: 2, name: "host_local", displayName: nil, :[] => "host_local"),
-        double(id: 3, name: "local_host", displayName: nil, :[] => "loal_host"),
-        double(id: 4, name: "production_host", displayName: nil, :[] => "production_host")
+        double(id: 1, name: "develop_host", displayName: nil, :[] => "develop_host", roles: {"example" => ["bar"]}),
+        double(id: 2, name: "host_local", displayName: nil, :[] => "host_local", roles: {"example" => ["bar"]}),
+        double(id: 3, name: "local_host", displayName: nil, :[] => "loal_host", roles: {"example" => ["bar"]}),
+        double(id: 4, name: "production_host", displayName: nil, :[] => "production_host", roles: {"example" => ["foo"]})
       ])
     end
 
@@ -158,6 +158,15 @@ describe Malsh::CLI do
       it {
         is_expected.to be_truthy
         expect(Malsh::Notification::Base).to have_received(:notify).with("ホスト一覧", ["develop_host"])
+      }
+    end
+
+    describe 'invert_role' do
+      subject { Malsh::CLI.new.invoke(:search, [], {invert_role: ["example:foo"]}) }
+
+      it {
+        is_expected.to be_truthy
+        expect(Malsh::Notification::Base).to have_received(:notify).with("ホスト一覧", ["develop_host", "host_local", "loal_host"])
       }
     end
   end
