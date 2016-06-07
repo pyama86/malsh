@@ -54,6 +54,8 @@ $ malsh search --past_date 7 --cpu 40 --memory 40 --subject 過去7日間のCPU�
  * 除外したいホスト名を正規表現で指定します。
 * --regex
  * 特定したいホスト名を正規表現で指定します。
+* --invert-role
+ * 除外したいロール名を`service:role`で指定します。
 
 ## Author
 pyama86

@@ -9,6 +9,7 @@ module Malsh
     class_option :api_key, :type => :string, :aliases => :k
     class_option :subject, :type => :string, :aliases => :s
     class_option :invert_match, :type => :array, :aliases => :v
+    class_option :invert_role, :type => :array, :aliases => :r
     class_option :regexp,:type => :array, :aliases => :e
 
     desc 'retire', 'check forget retire host'
