@@ -8,6 +8,7 @@ module Malsh
     class_option :slack_user, :type => :string, :aliases => :su
     class_option :api_key, :type => :string, :aliases => :k
     class_option :subject, :type => :string, :aliases => :s
+    class_option :org, :type => :string, :aliases => :o
     class_option :invert_match, :type => :array, :aliases => :v
     class_option :invert_role, :type => :array, :aliases => :r
     class_option :regexp,:type => :array, :aliases => :e
@@ -16,23 +17,23 @@ module Malsh
     def retire
       Malsh.init options
 
-      host_names = Parallel.map(Malsh.metrics('memory.used')) do|memory|
+      hosts = Parallel.map(Malsh.metrics('memory.used')) do|memory|
         host = Malsh.host_by_id memory.first
-        host.name if (!memory.last["memory.used"].respond_to?(:value) || !memory.last["memory.used"].value)
+        host if (!memory.last["memory.used"].respond_to?(:value) || !memory.last["memory.used"].value)
       end.flatten.compact
 
-      Malsh.notify("退役未了ホスト一覧", host_names)
+      Malsh.notify("退役未了ホスト一覧", hosts)
     end
 
     desc 'maverick', 'check no role'
     def maverick
       Malsh.init options
 
-      host_names = Parallel.map(Malsh.hosts) do |h|
-        h.name if h.roles.keys.size < 1
+      hosts = Parallel.map(Malsh.hosts) do |h|
+        h if h.roles.keys.size < 1
       end.flatten.compact
 
-      Malsh.notify("ロール無所属ホスト一覧", host_names)
+      Malsh.notify("ロール無所属ホスト一覧", hosts)
     end
 
     desc 'search', 'search hosts'
@@ -41,14 +42,13 @@ module Malsh
     option :memory_threshold, :type => :numeric, :aliases => :m
     option :status, :type => :string, :aliases => :st
     def search
-      _host_names = {}
       Malsh.init options
       o = options[:status] ? { status: options[:status] } : {}
       hosts = Malsh.hosts(o)
       Object.const_get("Malsh::HostMetrics").constants.each do |c|
         hosts = Object.const_get("Malsh::HostMetrics::#{c}").check(hosts)
       end
-      Malsh.notify("ホスト一覧", hosts.compact.map {|h| h["name"]})
+      Malsh.notify("ホスト一覧", hosts.compact)
     end
 
     map %w[--version -v] => :__print_version

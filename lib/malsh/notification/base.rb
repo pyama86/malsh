@@ -1,7 +1,8 @@
 module Malsh::Notification
   class Base
     def self.notify(subject, hosts)
-      puts "#{subject}: \n#{hosts.join("\n")}" if hosts.size > 0 && doit?
+      names = hosts.map(&:name)
+      puts "#{subject}: \n#{names.join("\n")}" if names.size > 0 && doit?
     end
 
     def self.doit?
