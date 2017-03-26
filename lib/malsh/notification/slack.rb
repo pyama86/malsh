@@ -3,8 +3,15 @@ module Malsh::Notification
   class Slack < Base
     def self.notify(subject, hosts)
       return unless doit?
+      lists = if Malsh.options[:org]
+                hosts.map do |h|
+                  "<https://mackerel.io/orgs/#{Malsh.options[:org]}/hosts/#{h.id}/-/setting|#{h.name}>"
+                end
+              else
+                hosts.map(&:name)
+              end
       note = {
-        text: hosts.join("\n"),
+        text: lists.join("\n"),
         color: "warning"
       }
       notifier.ping "*#{subject}*", attachments: [note]
