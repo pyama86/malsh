@@ -2,43 +2,6 @@ require 'malsh'
 require 'parallel'
 require 'pp'
 
-class Response < Hashie::Mash
-  disable_warnings
-end
-
-module   Mackerel
-  class Client
-    module Org
-      def org
-        response = get 'org'
-        response.body
-      end
-    end
-  end
-end
-
-module Mackerel
-  class Client
-    module Monitor
-      def monitor(id)
-        response = get "monitors/#{id}"
-        p response.body
-        response.body.monitor
-      end
-    end
-  end
-end
-
-
-module Mackerel
-  class Client
-    include Configuration
-    include Connection
-
-    include Client::Org
-  end
-end
-
 module Malsh
   class CLI < Thor
     class_option :slack_webhook, :type => :string, :aliases => :sw
