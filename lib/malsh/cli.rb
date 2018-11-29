@@ -1,6 +1,44 @@
 require 'malsh'
 require 'parallel'
 require 'pp'
+
+class Response < Hashie::Mash
+  disable_warnings
+end
+
+module   Mackerel
+  class Client
+    module Org
+      def org
+        response = get 'org'
+        response.body
+      end
+    end
+  end
+end
+
+module Mackerel
+  class Client
+    module Monitor
+      def monitor(id)
+        response = get "monitors/#{id}"
+        p response.body
+        response.body.monitor
+      end
+    end
+  end
+end
+
+
+module Mackerel
+  class Client
+    include Configuration
+    include Connection
+
+    include Client::Org
+  end
+end
+
 module Malsh
   class CLI < Thor
     class_option :slack_webhook, :type => :string, :aliases => :sw
@@ -49,6 +87,68 @@ module Malsh
         hosts = Object.const_get("Malsh::HostMetrics::#{c}").check(hosts)
       end
       Malsh.notify("ホスト一覧", hosts.compact)
+    end
+
+
+    desc 'alert', 'list alerts'
+    def alert
+      Malsh.init options
+      org = Mackerel.org.name
+      alerts = Mackerel.alerts
+
+      attachments = []
+      alerts.each do |alert|
+        color = case alert.status
+                when 'CRITICAL'
+                  'danger'
+                when 'WARNING'
+                  'warning'
+                else
+                  ''
+                end
+
+        if alert.type == 'external'
+          monitor = Mackerel.monitor(alert.monitorId)
+          attachments << {
+              title: monitor.name,
+              title_link: "https://mackerel.io/orgs/#{org}/alerts/#{alert.id}",
+              text: alert.message,
+              color: color,
+              fields: [
+                  {
+                      title: 'Type',
+                      value: alert.type
+                  },
+                  {
+                      title: 'OpenedAt',
+                      value: Time.at(alert.openedAt).strftime("%Y/%m/%d %H:%M:%S")
+                  }
+              ]
+
+          }
+        else
+          host = Malsh.host_by_id(alert.hostId)
+          attachments << {
+              title: host.name,
+              title_link: "https://mackerel.io/orgs/#{org}/alerts/#{alert.id}",
+              text: alert.message,
+              color: color,
+              fields: [
+                  {
+                      title: 'Type',
+                      value: alert.type
+                  },
+                  {
+                      title: 'OpenedAt',
+                      value: Time.at(alert.openedAt).strftime("%Y/%m/%d %H:%M:%S")
+                  }
+              ]
+          }
+
+        end
+
+      end
+      Malsh::Notification::Slack.notifier.ping "*アラート一覧*", attachments: attachments
     end
 
     map %w[--version -v] => :__print_version
