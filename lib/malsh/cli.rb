@@ -93,10 +93,9 @@ module Malsh
     def alert
       Malsh.init options
       org = Mackerel.org.name
-      alerts = Mackerel.alerts
-
       attachments = []
-      alerts.each do |alert|
+
+      Mackerel.alerts.each do |alert|
         color = case alert.status
                 when 'CRITICAL'
                   'danger'
