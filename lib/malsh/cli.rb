@@ -89,7 +89,6 @@ module Malsh
       Malsh.notify("ホスト一覧", hosts.compact)
     end
 
-
     desc 'alert', 'list alerts'
     def alert
       Malsh.init options
@@ -107,46 +106,29 @@ module Malsh
                   ''
                 end
 
-        if alert.type == 'external'
-          monitor = Mackerel.monitor(alert.monitorId)
-          attachments << {
-              title: monitor.name,
-              title_link: "https://mackerel.io/orgs/#{org}/alerts/#{alert.id}",
-              text: alert.message,
-              color: color,
-              fields: [
-                  {
-                      title: 'Type',
-                      value: alert.type
-                  },
-                  {
-                      title: 'OpenedAt',
-                      value: Time.at(alert.openedAt).strftime("%Y/%m/%d %H:%M:%S")
-                  }
-              ]
+        title = case alert.type
+                when 'external'
+                  Mackerel.monitor(alert.monitorId).name
+                else
+                  Malsh.host_by_id(alert.hostId).name
+                end
 
-          }
-        else
-          host = Malsh.host_by_id(alert.hostId)
-          attachments << {
-              title: host.name,
-              title_link: "https://mackerel.io/orgs/#{org}/alerts/#{alert.id}",
-              text: alert.message,
-              color: color,
-              fields: [
-                  {
-                      title: 'Type',
-                      value: alert.type
-                  },
-                  {
-                      title: 'OpenedAt',
-                      value: Time.at(alert.openedAt).strftime("%Y/%m/%d %H:%M:%S")
-                  }
-              ]
-          }
-
-        end
-
+        attachments << {
+            title: title,
+            title_link: "https://mackerel.io/orgs/#{org}/alerts/#{alert.id}",
+            text: alert.message,
+            color: color,
+            fields: [
+                {
+                    title: 'Type',
+                    value: alert.type
+                },
+                {
+                    title: 'OpenedAt',
+                    value: Time.at(alert.openedAt).strftime("%Y/%m/%d %H:%M:%S")
+                }
+            ]
+        }
       end
       Malsh::Notification::Slack.notifier.ping "*アラート一覧*", attachments: attachments
     end
