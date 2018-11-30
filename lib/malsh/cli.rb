@@ -23,7 +23,7 @@ module Malsh
         host if (!memory.last["memory.used"].respond_to?(:value) || !memory.last["memory.used"].value)
       end.flatten.compact
 
-      Malsh.notify("退役未了ホスト一覧", hosts)
+      Malsh.notify_host("退役未了ホスト一覧", hosts)
     end
 
     desc 'maverick', 'check no role'
@@ -34,7 +34,7 @@ module Malsh
         h if h.roles.keys.size < 1
       end.flatten.compact
 
-      Malsh.notify("ロール無所属ホスト一覧", hosts)
+      Malsh.notify_host("ロール無所属ホスト一覧", hosts)
     end
 
     desc 'search', 'search hosts'
@@ -49,60 +49,14 @@ module Malsh
       Object.const_get("Malsh::HostMetrics").constants.each do |c|
         hosts = Object.const_get("Malsh::HostMetrics::#{c}").check(hosts)
       end
-      Malsh.notify("ホスト一覧", hosts.compact)
+      Malsh.notify_host("ホスト一覧", hosts.compact)
     end
 
     desc 'alert', 'list alerts'
     def alert
       Malsh.init options
-      org = Mackerel.org.name
-      attachments = []
-
-      Mackerel.alerts.each do |alert|
-        color = case alert.status
-                when 'CRITICAL'
-                  'danger'
-                when 'WARNING'
-                  'warning'
-                else
-                  ''
-                end
-
-        title = case alert.type
-                when 'external'
-                  Mackerel.monitor(alert.monitorId).name
-                else
-                  host = Malsh.host_by_id(alert.hostId)
-                  host.name
-                end
-
-        author_name = case alert.type
-                      when 'external'
-                        ''
-                      else
-                        host = Malsh.host_by_id(alert.hostId)
-                        host.roles.map{|k, v| v.map{|r| "#{k}: #{r}"}}.flatten.join(" ")
-                      end
-
-        attachments << {
-            author_name: author_name,
-            title: title,
-            title_link: "https://mackerel.io/orgs/#{org}/alerts/#{alert.id}",
-            text: alert.message,
-            color: color,
-            fields: [
-                {
-                    title: 'Type',
-                    value: alert.type
-                },
-                {
-                    title: 'OpenedAt',
-                    value: Time.at(alert.openedAt).strftime("%Y/%m/%d %H:%M:%S")
-                }
-            ]
-        }
-      end
-      Malsh::Notification::Slack.notifier.ping "*アラート一覧*", attachments: attachments
+      alerts = Malsh.alerts
+      Malsh.notify_alert('アラート一覧', alerts)
     end
 
     map %w[--version -v] => :__print_version

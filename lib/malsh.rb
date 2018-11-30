@@ -7,9 +7,15 @@ require "malsh/host_metrics"
 
 module Malsh
   class << self
-    def notify(subject, host)
+    def notify_host(subject, host)
       Malsh::Notification.constants.each do |c|
-        Object.const_get("Malsh::Notification::#{c}").notify(options[:subject] || subject, host)
+        Object.const_get("Malsh::Notification::#{c}").notify_host(options[:subject] || subject, host)
+      end
+    end
+
+    def notify_alert(subject, alerts)
+      Malsh::Notification.constants.each do |c|
+        Object.const_get("Malsh::Notification::#{c}").notify_alert(options[:subject] || subject, alerts)
       end
     end
 
@@ -40,6 +46,17 @@ module Malsh
           service, role = r.split(/:/)
           h.roles[service] && h.roles[service].include?(role)
         end
+      end
+    end
+
+    def alerts()
+      @_alerts ||= Mackerel.alerts.map do |alert|
+        if alert.type == 'external'
+          alert['monitor'] = Mackerel.monitor(alert.monitorId)
+        else
+          alert['host'] = Malsh.host_by_id(alert.hostId)
+        end
+        alert
       end
     end
 
