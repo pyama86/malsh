@@ -30,15 +30,13 @@ module Malsh::Notification
                   ''
                 end
 
-        title = case alert.type
-                when 'external'
+        title = if alert.type == 'external'
                   alert.monitor.name
                 else
                   alert.host.name
                 end
 
-        author_name = case alert.type
-                      when 'external'
+        author_name = if alert.type == 'external'
                         ''
                       else
                         alert.host.roles.map{|k, v| v.map{|r| "#{k}: #{r}"}}.flatten.join(" ")
