@@ -2,7 +2,7 @@ require 'spec_helper'
 require 'ostruct'
 describe Malsh::CLI do
   before do
-    allow(Malsh::Notification::Base).to receive(:notify)
+    allow(Malsh::Notification::Base).to receive(:notify_host)
     Malsh.instance_variable_set(:@_hosts, nil)
   end
 
@@ -39,7 +39,7 @@ describe Malsh::CLI do
 
           it 'upper threshould' do
             is_expected.to be_truthy
-            expect(Malsh::Notification::Base).to have_received(:notify).with("ホスト一覧", [])
+            expect(Malsh::Notification::Base).to have_received(:notify_host).with("ホスト一覧", [])
           end
         end
 
@@ -58,7 +58,7 @@ describe Malsh::CLI do
 
           it 'lower threshold' do
             is_expected.to be_truthy
-            expect(Malsh::Notification::Base).to have_received(:notify).with("ホスト一覧", [{"id"=>1, "name"=>"example_host", "meta"=>{"cpu"=>[0, 1]}}])
+            expect(Malsh::Notification::Base).to have_received(:notify_host).with("ホスト一覧", [{"id"=>1, "name"=>"example_host", "meta"=>{"cpu"=>[0, 1]}}])
           end
         end
       end
