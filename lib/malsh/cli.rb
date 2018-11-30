@@ -72,10 +72,20 @@ module Malsh
                 when 'external'
                   Mackerel.monitor(alert.monitorId).name
                 else
-                  Malsh.host_by_id(alert.hostId).name
+                  host = Malsh.host_by_id(alert.hostId)
+                  host.name
                 end
 
+        author_name = case alert.type
+                      when 'external'
+                        ''
+                      else
+                        host = Malsh.host_by_id(alert.hostId)
+                        host.roles.map{|k, v| v.map{|r| "#{k}: #{r}"}}.flatten.join(" ")
+                      end
+
         attachments << {
+            author_name: author_name,
             title: title,
             title_link: "https://mackerel.io/orgs/#{org}/alerts/#{alert.id}",
             text: alert.message,
