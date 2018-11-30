@@ -1,7 +1,7 @@
 require 'slack-notifier'
 module Malsh::Notification
   class Slack < Base
-    def self.notify(subject, hosts)
+    def self.notify_host(subject, hosts)
       return unless doit?
       lists = if Malsh.options[:org]
                 hosts.map do |h|
@@ -15,6 +15,52 @@ module Malsh::Notification
         color: "warning"
       }
       notifier.ping "*#{subject}*", attachments: [note]
+    end
+
+    def self.notify_alert(subject, alerts)
+      org = Mackerel.org.name
+      attachments = []
+      alerts.each do |alert|
+        color = case alert.status
+                when 'CRITICAL'
+                  'danger'
+                when 'WARNING'
+                  'warning'
+                else
+                  ''
+                end
+
+        title = if alert.type == 'external'
+                  alert.monitor.name
+                else
+                  alert.host.name
+                end
+
+        author_name = if alert.type == 'external'
+                        ''
+                      else
+                        alert.host.roles.map{|k, v| v.map{|r| "#{k}: #{r}"}}.flatten.join(" ")
+                      end
+
+        attachments << {
+            author_name: author_name,
+            title: title,
+            title_link: "https://mackerel.io/orgs/#{org}/alerts/#{alert.id}",
+            text: alert.message,
+            color: color,
+            fields: [
+                {
+                    title: 'Type',
+                    value: alert.type
+                },
+                {
+                    title: 'OpenedAt',
+                    value: Time.at(alert.openedAt).strftime("%Y/%m/%d %H:%M:%S")
+                }
+            ]
+        }
+      end
+      notifier.ping "*#{subject}*", attachments: attachments
     end
 
     def self.doit?

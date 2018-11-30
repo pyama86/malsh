@@ -22,7 +22,7 @@ module Malsh
         host if (!memory.last["memory.used"].respond_to?(:value) || !memory.last["memory.used"].value)
       end.flatten.compact
 
-      Malsh.notify("退役未了ホスト一覧", hosts)
+      Malsh.notify_host("退役未了ホスト一覧", hosts)
     end
 
     desc 'maverick', 'check no role'
@@ -33,7 +33,7 @@ module Malsh
         h if h.roles.keys.size < 1
       end.flatten.compact
 
-      Malsh.notify("ロール無所属ホスト一覧", hosts)
+      Malsh.notify_host("ロール無所属ホスト一覧", hosts)
     end
 
     desc 'search', 'search hosts'
@@ -48,7 +48,14 @@ module Malsh
       Object.const_get("Malsh::HostMetrics").constants.each do |c|
         hosts = Object.const_get("Malsh::HostMetrics::#{c}").check(hosts)
       end
-      Malsh.notify("ホスト一覧", hosts.compact)
+      Malsh.notify_host("ホスト一覧", hosts.compact)
+    end
+
+    desc 'alert', 'list alerts'
+    def alert
+      Malsh.init options
+      alerts = Malsh.alerts
+      Malsh.notify_alert('アラート一覧', alerts)
     end
 
     map %w[--version -v] => :__print_version
