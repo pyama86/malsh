@@ -1,7 +1,6 @@
 require 'malsh'
 require 'parallel'
 require 'pp'
-
 module Malsh
   class CLI < Thor
     class_option :slack_webhook, :type => :string, :aliases => :sw
