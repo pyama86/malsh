@@ -83,5 +83,13 @@ module Malsh
         puts e
       end
     end
+
+    def host_metric_names(id)
+      begin
+        Mackerel.host_metric_names(id)
+      rescue => e
+        puts e
+      end
+    end
   end
 end
