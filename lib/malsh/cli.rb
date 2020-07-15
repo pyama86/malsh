@@ -17,11 +17,15 @@ module Malsh
     def retire
       Malsh.init options
 
-      hosts = Parallel.map(Malsh.metrics('memory.used')) do|memory|
-        host = Malsh.host_by_id memory.first
-        host if (!memory.last["memory.used"].respond_to?(:value) || !memory.last["memory.used"].value)
+      hosts = Parallel.map(Malsh.hosts) do |h|
+        m = Malsh.host_metrics(
+          h.id,
+          Malsh.host_metric_names(h.id).first,
+          Time.now.to_i - 86400,
+          Time.now.to_i
+        )
+        h if !m || m["metrics"].size == 0
       end.flatten.compact
-
       Malsh.notify_host("退役未了ホスト一覧", hosts)
     end
 
