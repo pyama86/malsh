@@ -5,7 +5,7 @@ module Malsh::Notification
       return unless doit?
       lists = if Malsh.options[:org]
                 hosts.map do |h|
-                  "<https://mackerel.io/orgs/#{Malsh.options[:org]}/hosts/#{h.id}/-/setting|#{h.name}>"
+                  "<https://mackerel.io/orgs/#{Malsh.options[:org]}/hosts/#{h.id}/-/setting|#{h.name}(#{h.roles.keys.join(",")})>"
                 end
               else
                 hosts.map(&:name)
