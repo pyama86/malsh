@@ -15,6 +15,11 @@ describe Malsh::CLI do
             "name" => "example_host",
             "meta" => {
               "cpu" => [0, 1]
+            },
+            "roles" => {
+              "service" => [
+                "role"
+              ]
             }
           }
         ])
@@ -58,7 +63,16 @@ describe Malsh::CLI do
 
           it 'lower threshold' do
             is_expected.to be_truthy
-            expect(Malsh::Notification::Base).to have_received(:notify_host).with("ホスト一覧", [{"id"=>1, "name"=>"example_host", "meta"=>{"cpu"=>[0, 1]}}])
+            expect(Malsh::Notification::Base).to have_received(:notify_host).with("ホスト一覧", [
+              {
+                "id"=>1,
+                "name"=>"example_host",
+                "meta"=>{"cpu"=>[0, 1]},
+                "roles" => {
+                  "service" => ["role"]
+                }
+              }
+            ])
           end
         end
       end
