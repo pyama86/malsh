@@ -1,8 +1,10 @@
 module Malsh::Notification
   class Base
     def self.notify_host(subject, hosts)
-      names = hosts.map(&:name)
-      puts "#{subject}: \n#{names.join("\n")}" if names.size > 0 && doit?
+      puts "#{subject}:"
+      hosts.map do |h|
+        puts "#{h.name}(#{h.roles.keys.join(",")})"
+      end if doit?
     end
 
     def self.notify_alert(subject, alerts)
