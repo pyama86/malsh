@@ -24,7 +24,7 @@ module Malsh
           Time.now.to_i - 86400,
           Time.now.to_i
         )
-        h if !m || m["metrics"].size == 0
+        h if (!m || (m["metrics"] && m["metrics"].size == 0)) && !(h["meta"].has_key?("cloud") && %w(elb rds cloudfront).include?(h["meta"]["cloud"]["provider"]))
       end.flatten.compact
       Malsh.notify_host("退役未了ホスト一覧", hosts)
     end
