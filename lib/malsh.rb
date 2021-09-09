@@ -51,10 +51,10 @@ module Malsh
 
     def alerts()
       @_alerts ||= Mackerel.alerts.map do |alert|
-        if alert.type == 'external'
-          alert['monitor'] = Mackerel.monitor(alert.monitorId)
-        else
+        if alert_has_host?(alert)
           alert['host'] = Malsh.host_by_id(alert.hostId)
+        else
+          alert['monitor'] = Mackerel.monitor(alert.monitorId)
         end
         alert
       end
@@ -90,6 +90,12 @@ module Malsh
       rescue => e
         puts e
       end
+    end
+
+    def alert_has_host?(alert)
+      exclude_types = ['external', 'service']
+      return false if exclude_types.include?(alert.type)
+      true
     end
   end
 end
