@@ -30,16 +30,16 @@ module Malsh::Notification
                   ''
                 end
 
-        title = if alert.type == 'external'
-                  alert.monitor.name
-                else
+        title = if Malsh.alert_has_host?(alert)
                   alert.host.name
+                else
+                  alert.monitor.name
                 end
 
-        author_name = if alert.type == 'external'
-                        ''
-                      else
+        author_name = if Malsh.alert_has_host?(alert)
                         alert.host.roles.map{|k, v| v.map{|r| "#{k}: #{r}"}}.flatten.join(" ")
+                      else
+                        ''
                       end
 
         attachments << {
