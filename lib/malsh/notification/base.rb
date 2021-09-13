@@ -10,11 +10,10 @@ module Malsh::Notification
     def self.notify_alert(subject, alerts)
       puts "#{subject}: "
       alerts.each do |alert|
-        title = case alert.type
-                when 'external'
-                  alert.monitor.name
-                else
+        title = if Malsh.alert_has_host?(alert)
                   alert.host.name
+                else
+                  alert.monitor.name
                 end
         puts "#{title}: #{alert.message}"
       end
