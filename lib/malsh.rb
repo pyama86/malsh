@@ -1,9 +1,9 @@
-require "malsh/version"
+require 'malsh/version'
 require 'thor'
 require 'mackerel-rb'
-require "malsh/cli"
-require "malsh/notification"
-require "malsh/host_metrics"
+require 'malsh/cli'
+require 'malsh/notification'
+require 'malsh/host_metrics'
 
 module Malsh
   class << self
@@ -19,7 +19,7 @@ module Malsh
       end
     end
 
-    def options(ops=nil)
+    def options(ops = nil)
       @_options = ops if ops
       @_options
     end
@@ -38,9 +38,9 @@ module Malsh
 
     def hosts(options = {})
       @_hosts ||= Mackerel.hosts(options).reject do |h|
-        Malsh.options[:invert_match] && Malsh.options[:invert_match].find {|v| host_name(h).match(/#{v}/) }
+        Malsh.options[:invert_match] && Malsh.options[:invert_match].find { |v| host_name(h).match(/#{v}/) }
       end.reject do |h|
-        Malsh.options[:regexp] && Malsh.options[:regexp].all? {|r| !host_name(h).match(/#{r}/)}
+        Malsh.options[:regexp] && Malsh.options[:regexp].all? { |r| !host_name(h).match(/#{r}/) }
       end.reject do |h|
         Malsh.options[:invert_role] && Malsh.options[:invert_role].find do |r|
           service, role = r.split(/:/)
@@ -49,7 +49,7 @@ module Malsh
       end
     end
 
-    def alerts()
+    def alerts
       @_alerts ||= Mackerel.alerts.map do |alert|
         if alert_has_host?(alert)
           alert['host'] = Malsh.host_by_id(alert.hostId)
@@ -71,30 +71,27 @@ module Malsh
     def metrics(name)
       hash = {}
       hosts.map(&:id).each_slice(200) do |ids|
-        hash.merge!(Mackerel.latest_tsdb({hostId: ids, name: name}))
+        hash.merge!(Mackerel.latest_tsdb({ hostId: ids, name: name }))
       end
       hash
     end
 
     def host_metrics(id, name, from, to)
-      begin
-        Mackerel.host_metrics(id, name: name, from: from, to: to)
-      rescue => e
-        puts e
-      end
+      Mackerel.host_metrics(id, name: name, from: from, to: to)
+    rescue StandardError => e
+      puts e
     end
 
     def host_metric_names(id)
-      begin
-        Mackerel.host_metric_names(id)
-      rescue => e
-        puts e
-      end
+      Mackerel.host_metric_names(id)
+    rescue StandardError => e
+      puts e
     end
 
     def alert_has_host?(alert)
-      exclude_types = ['external', 'service']
+      exclude_types = %w[external service expression]
       return false if exclude_types.include?(alert.type)
+
       true
     end
   end
